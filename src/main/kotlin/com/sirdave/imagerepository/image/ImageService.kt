@@ -1,12 +1,16 @@
 package com.sirdave.imagerepository.image
 
+import com.cloudinary.utils.ObjectUtils
 import com.sirdave.imagerepository.user.User
+import com.sirdave.imagerepository.utils.CloudinaryConf
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class ImageService(private val imageRepository: ImageRepository) {
+    val cloudinary = CloudinaryConf.getConfiguration()
 
     fun addImage(image: Image): Image{
         return imageRepository.save(image)
@@ -69,6 +73,29 @@ class ImageService(private val imageRepository: ImageRepository) {
         check(exists) { "Image with id $id does not exist" }
         imageRepository.deleteById(id)
 
+    }
+
+    fun deleteFromCloudinary(imageId: Long){
+        val image = imageRepository.findByIdOrNull(imageId)
+        val publicId = image?.cloudinaryId
+        val response = cloudinary.uploader().destroy(publicId,
+            ObjectUtils.emptyMap()) as HashMap<Any?, Any?>
+
+        println("delete response is ==========> $response")
+    }
+
+
+    fun uploadToCloudinary(file: ByteArray, name: String, category: String): HashMap<Any?, Any?> {
+        val data = cloudinary.uploader().upload(
+            file,
+            ObjectUtils.asMap(
+                "folder", "image_repository/$category/",
+                "use_filename", "true"
+            )
+        ) as HashMap<Any?, Any?>
+
+        println("Cloudinary response data is =========> $data")
+        return data
     }
 
     fun updateImageProperties(imageId: Long, user: User): Image?{
