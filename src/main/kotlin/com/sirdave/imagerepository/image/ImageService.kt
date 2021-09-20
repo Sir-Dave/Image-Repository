@@ -26,9 +26,14 @@ class ImageService(private val imageRepository: ImageRepository) {
         return imageRepository.existsById(id)
     }
 
+    fun isCategoryExists(category: String): Boolean{
+        val images  = imageRepository.findAll()
+        return images.any{ it.category == category}
+    }
+
     fun isImageExistByUser(user: User): Boolean{
-        val carts = imageRepository.findAll()
-        return carts.any { it.user == user }
+        val images = imageRepository.findAll()
+        return images.any { it.user == user }
     }
 
     fun filterResult(pagedResult: Page<Image>): List<Image>{

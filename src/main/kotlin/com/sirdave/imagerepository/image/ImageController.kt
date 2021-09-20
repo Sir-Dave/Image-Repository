@@ -1,5 +1,7 @@
 package com.sirdave.imagerepository.image
 
+import com.sirdave.imagerepository.auth.UserResponse
+import com.sirdave.imagerepository.user.UserService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -8,7 +10,8 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/v1/images")
-class ImageController(private val imageService: ImageService) {
+class ImageController(private val imageService: ImageService,
+                      private val userService: UserService) {
 
     @PostMapping
     fun uploadImage(
@@ -31,25 +34,50 @@ class ImageController(private val imageService: ImageService) {
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "50") pageSize: Int,
         @RequestParam(defaultValue = "") category: String,
-        @RequestParam(defaultValue = "") username: String): ResponseEntity<List<Image>>{
-        /**if (category != "" && username != ""){
-            //imageService.findImagesByCategoryAndUser(category, user, page,  pageSize)
+        @RequestParam(defaultValue = "") username: String): ResponseEntity<ImageResponse<*>>{
+
+        val user = userService.findUserByUsername(username)
+        val isCategoryExists = imageService.isCategoryExists(category)
+
+        if (category != "" && username != ""){
+            check(user != null){
+                val response = ImageResponse(success = false, data = "User does not exist")
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
+            }
+
+            check(isCategoryExists){
+                val response = ImageResponse(success = false, data = "Category not found")
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
+            }
+
+            val images = imageService.findImagesByCategoryAndUser(category, user, page,  pageSize)
+            val response = ImageResponse(success = true, data = images)
+            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
         }
         else if (username != ""){
-            //val user = User()
-            //imageService.findImagesByUser()
-
+            check(user != null){
+                val response = ImageResponse(success = false, data = "User does not exist")
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
+            }
+            val images = imageService.findImagesByUser(user)
+            val response = ImageResponse(success = true, data = images)
+            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
         }
         else if (category != ""){
-            imageService.findImagesByCategory(category, page, pageSize)
+            check(isCategoryExists){
+                val response = ImageResponse(success = false, data = "Category not found")
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
+            }
+            val images = imageService.findImagesByCategory(category, page, pageSize)
+            val response = ImageResponse(success = true, data = images)
+            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
         }
 
         else{
-
-        }*/
-        val images =  imageService.getAllImages(page, pageSize)
-        return ResponseEntity(images, HttpHeaders(), HttpStatus.OK)
-
+            val images =  imageService.getAllImages(page, pageSize)
+            val response = ImageResponse(success = true, data = images)
+            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+        }
     }
 
 
