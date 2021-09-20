@@ -40,7 +40,7 @@ class User(
 
     @JsonIgnore
     override fun getAuthorities(): List<SimpleGrantedAuthority?> {
-        val authority = SimpleGrantedAuthority("Users")
+        val authority = SimpleGrantedAuthority("USER")
         return listOf(authority)
     }
 

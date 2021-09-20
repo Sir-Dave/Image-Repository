@@ -1,4 +1,4 @@
-package com.sirdave.imagerepository.user
+package com.sirdave.imagerepository.auth
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude

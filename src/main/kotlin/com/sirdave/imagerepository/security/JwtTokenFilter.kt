@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
+import org.springframework.util.ObjectUtils
 import org.springframework.util.StringUtils
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
@@ -29,7 +30,7 @@ class JwtTokenFilter(private val jwtTokenUtil: JwtTokenUtil,
         chain: FilterChain) {
         // Get authorization header and validate
         val header = request.getHeader(HttpHeaders.AUTHORIZATION)
-        if (StringUtils.isEmpty(header) || !header.startsWith("Bearer ")) {
+        if (ObjectUtils.isEmpty(header) || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response)
             return
         }

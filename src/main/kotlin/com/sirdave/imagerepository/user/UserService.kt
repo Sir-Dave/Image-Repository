@@ -13,10 +13,10 @@ class UserService(private val userRepository: UserRepository,
 
 
    @Throws(UsernameNotFoundException::class)
-    override fun loadUserByUsername(username: String?): UserDetails? {
-       return userRepository.findByUserName(username)
+    override fun loadUserByUsername(email: String?): UserDetails? {
+       return userRepository.findByEmail(email)
            ?.orElseThrow{
-               UsernameNotFoundException("User with username $username not found")
+               UsernameNotFoundException("User with email $email not found")
            }
     }
 
@@ -30,10 +30,13 @@ class UserService(private val userRepository: UserRepository,
         return userRepository.findByUserName(username!!)!!.isPresent
     }
 
+    fun isUserExistsByEmail(email: String?): Boolean{
+        return userRepository.findByEmail(email)!!.isPresent
+    }
+
     fun doPasswordsMatch(p1: String, p2: String): Boolean{
        return p1 == p2
     }
-
 
     fun saveUser(user: User): User {
         val encodedPassword = passwordEncoder.encode(user.password)

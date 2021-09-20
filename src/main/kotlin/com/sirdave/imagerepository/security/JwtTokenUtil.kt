@@ -16,7 +16,7 @@ class JwtTokenUtil {
     fun generateAccessToken(user: User): String {
         val jwtIssuer = "shopify-image-repository"
         return Jwts.builder()
-            .setSubject(format("%s,%s", user.id, user.username))
+            .setSubject(format("%s,%s", user.id, user.email))
             .setIssuer(jwtIssuer)
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 24 hours

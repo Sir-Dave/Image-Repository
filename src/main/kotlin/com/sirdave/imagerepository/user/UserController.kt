@@ -1,6 +1,7 @@
 package com.sirdave.imagerepository.user
 
 
+import com.sirdave.imagerepository.auth.UserResponse
 import com.sirdave.imagerepository.security.JwtTokenUtil
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -11,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
 @RestController
-@RequestMapping("api/v1/profile")
+@RequestMapping("api/v1/user")
 class UserController(private val jwtTokenUtil: JwtTokenUtil,
                      private val userService: UserService
 ) {
 
-    @GetMapping
-    fun getUser(request: HttpServletRequest): ResponseEntity<UserResponse<*>>{
+    @GetMapping("/profile")
+    fun getMyProfile(request: HttpServletRequest): ResponseEntity<UserResponse<*>>{
         return try {
             val user = getCurrentLoggedUser(request)
             val response = UserResponse(success = true, data = user, null)
@@ -26,6 +27,11 @@ class UserController(private val jwtTokenUtil: JwtTokenUtil,
             val response = UserResponse(success = false, data = "You have to log in first", null)
             ResponseEntity(response, HttpHeaders(), HttpStatus.UNAUTHORIZED)
         }
+    }
+
+    @GetMapping("")
+    fun getUserProfile(){
+
     }
 
     private fun getCurrentLoggedUser(request: HttpServletRequest): User{

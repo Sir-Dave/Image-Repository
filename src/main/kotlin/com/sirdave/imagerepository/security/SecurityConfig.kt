@@ -39,9 +39,9 @@ class SecurityConfig(
     @Throws(Exception::class)
     public override fun configure(auth: AuthenticationManagerBuilder) {
         auth.userDetailsService(
-            UserDetailsService { username: String ->
-                repository.findByUserName(username)
-                    ?.orElseThrow { UsernameNotFoundException("User: $username not found") }
+            UserDetailsService { email: String ->
+                repository.findByEmail(email)
+                    ?.orElseThrow { UsernameNotFoundException("User: $email not found") }
             }
         ).passwordEncoder(bCryptPasswordEncoder())
     }
