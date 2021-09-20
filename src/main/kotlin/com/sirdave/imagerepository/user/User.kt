@@ -31,7 +31,6 @@ class User(
     var dateJoined: LocalDate? = dateJoined
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnore
     var images: List<Image>? = null
 
     fun setPassword(password: String?) {

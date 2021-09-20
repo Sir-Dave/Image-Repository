@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
@@ -29,9 +30,21 @@ class UserController(private val jwtTokenUtil: JwtTokenUtil,
         }
     }
 
-    @GetMapping("")
-    fun getUserProfile(){
+    @GetMapping("/{username}")
+    fun getUserProfile(@PathVariable username: String): ResponseEntity<UserResponse<*>>{
+        val otherUser = userService.findUserByUsername(username)
+        return try {
+            check(otherUser != null){
+                val response = UserResponse(success = false, data = "User does not exist", null)
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
+            }
+            val response = UserResponse(success = true, data = otherUser, null)
+            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
 
+        } catch (error: NullPointerException){
+            val response = UserResponse(success = false, data = "You have to log in first", null)
+            ResponseEntity(response, HttpHeaders(), HttpStatus.UNAUTHORIZED)
+        }
     }
 
     private fun getCurrentLoggedUser(request: HttpServletRequest): User{

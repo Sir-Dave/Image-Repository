@@ -25,6 +25,13 @@ class UserService(private val userRepository: UserRepository,
             IllegalStateException("User with $id does not exist")
         }
 
+    fun findUserByUsername(username: String?): User? {
+        return userRepository.findByUserName(username)
+            ?.orElseThrow{
+                UsernameNotFoundException("User with username $username not found")
+            }
+    }
+
 
     fun isUserExists(username: String?): Boolean{
         return userRepository.findByUserName(username!!)!!.isPresent
