@@ -29,4 +29,4 @@ This repository is my submission for Shopify's Developer Intern Challenge questi
 
 Or you can test out the live application [here](https://shopify-winter2022-challenge.herokuapp.com/).
 
-Click [here](https://app.swaggerhub.com/Sir-Dave) to see API documentation.
+Click [here](https://app.swaggerhub.com/apis/Sir-Dave/Shopify-Developer-Intern-Challenge/1.0.0/) to see API documentation.
