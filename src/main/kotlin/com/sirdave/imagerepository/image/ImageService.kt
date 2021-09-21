@@ -102,10 +102,4 @@ class ImageService(private val imageRepository: ImageRepository) {
         println("Cloudinary response data is =========> $data")
         return data
     }
-
-    fun updateImageProperties(imageId: Long, user: User): Image?{
-        val image = getUserOwnedImage(user, imageId)
-        // edit the properties here
-        return null
-    }
 }

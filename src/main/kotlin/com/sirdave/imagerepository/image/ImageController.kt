@@ -110,11 +110,6 @@ class ImageController(private val imageService: ImageService,
         return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
     }
 
-    @PutMapping("/{id}")
-    fun updateImageProperties(@PathVariable id: Long){
-
-    }
-
     @DeleteMapping("/{id}")
     fun deleteImage(@PathVariable id: Long): ResponseEntity<ImageResponse<*>>{
         check(imageService.isImageExists(id)){
