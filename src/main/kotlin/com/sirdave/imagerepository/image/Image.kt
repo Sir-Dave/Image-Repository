@@ -15,7 +15,7 @@ class Image(
     @JsonIgnore
     var cloudinaryId: String,
 
-    @ManyToOne(cascade = [CascadeType.ALL])
+    @ManyToOne
     @JoinColumn(name = "user_id")
     var user: User) {
     @Id

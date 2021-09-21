@@ -30,9 +30,9 @@ class User(
     private var password: String? = password
     var dateJoined: LocalDate? = dateJoined
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore
-    var images: List<Image>? = null
+    var images: List<Image>? = arrayListOf()
 
     fun setPassword(password: String?) {
         this.password = password
