@@ -4,7 +4,7 @@ This repository is my submission for Shopify's Developer Intern Challenge questi
 
 **TASK: Build an Image Repository.**
 
-####Technologies and Frameworks used:
+#### Technologies and Frameworks used:
 - Spring Boot 
 - Kotlin
 - Spring Security
@@ -14,7 +14,7 @@ This repository is my submission for Shopify's Developer Intern Challenge questi
 - Heroku (deployment)
 - Maven (build tool)
 
-####Features:
+#### Features:
 1. JWT Authentication ( Register => Login ).
 2. Secure uploading and storing of images.
 3. Viewing all images.
@@ -22,7 +22,7 @@ This repository is my submission for Shopify's Developer Intern Challenge questi
 5. Secure deletion of images.
 6. Access control (prevent a user deleting images from another user).
 
-####Setting up Project locally
+#### Setting up Project locally
 - Clone the project.
 - Build using maven to import dependencies used in the project.
 - Run `ImageRepositoryApplication.kt` class to start the app server.
