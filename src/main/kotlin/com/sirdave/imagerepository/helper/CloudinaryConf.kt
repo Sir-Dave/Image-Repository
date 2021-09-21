@@ -1,4 +1,4 @@
-package com.sirdave.imagerepository.utils
+package com.sirdave.imagerepository.helper
 
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils

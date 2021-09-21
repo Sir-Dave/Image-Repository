@@ -20,7 +20,7 @@ class UserService(private val userRepository: UserRepository,
            }
     }
 
-    fun getOneUser(id: Long): User = userRepository.findById(id)
+    fun getOneUser(id: Long): User? = userRepository.findById(id)
         .orElseThrow{
             IllegalStateException("User with $id does not exist")
         }

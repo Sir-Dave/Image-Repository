@@ -2,7 +2,7 @@ package com.sirdave.imagerepository.image
 
 import com.cloudinary.utils.ObjectUtils
 import com.sirdave.imagerepository.user.User
-import com.sirdave.imagerepository.utils.CloudinaryConf
+import com.sirdave.imagerepository.helper.CloudinaryConf
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -29,11 +29,6 @@ class ImageService(private val imageRepository: ImageRepository) {
     fun isCategoryExists(category: String): Boolean{
         val images  = imageRepository.findAll()
         return images.any{ it.category == category}
-    }
-
-    fun isImageExistByUser(user: User): Boolean{
-        val images = imageRepository.findAll()
-        return images.any { it.user == user }
     }
 
     fun filterResult(pagedResult: Page<Image>): List<Image>{
@@ -90,7 +85,7 @@ class ImageService(private val imageRepository: ImageRepository) {
     }
 
 
-    fun uploadToCloudinary(file: ByteArray, name: String, category: String): HashMap<Any?, Any?> {
+    fun uploadToCloudinary(file: ByteArray, name: String, category: String): HashMap<Any?, Any?>? {
         val data = cloudinary.uploader().upload(
             file,
             ObjectUtils.asMap(
@@ -108,7 +103,4 @@ class ImageService(private val imageRepository: ImageRepository) {
         // edit the properties here
         return null
     }
-
-
-
 }

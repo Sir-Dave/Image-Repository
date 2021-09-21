@@ -1,32 +1,46 @@
 package com.sirdave.imagerepository.image
 
-import com.sirdave.imagerepository.auth.UserResponse
+import com.sirdave.imagerepository.helper.getCurrentLoggedUser
+import com.sirdave.imagerepository.security.JwtTokenUtil
 import com.sirdave.imagerepository.user.UserService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("api/v1/images")
 class ImageController(private val imageService: ImageService,
-                      private val userService: UserService) {
+                      private val userService: UserService,
+                      private val jwtTokenUtil: JwtTokenUtil) {
 
     @PostMapping
     fun uploadImage(
         @RequestParam name: String,
         @RequestParam description: String,
         @RequestParam category: String,
-        @RequestParam file: MultipartFile): ResponseEntity<ImageResponse<*>>{
+        @RequestParam file: MultipartFile,
+        request: HttpServletRequest): ResponseEntity<ImageResponse<*>>{
+
+        val user = getCurrentLoggedUser(request, jwtTokenUtil, userService)
 
         val data = imageService.uploadToCloudinary(file.bytes, name, category)
-        val imageUrl = data["url"] as String?
-        val cloudinaryID = data["public_id"] as String
-        val image = imageUrl?.let { Image(name, description, category, it, cloudinaryID) }
-        val newImage = imageService.addImage(image!!)
-        val response = ImageResponse(true, newImage)
-        return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+        data?.let {
+            val imageUrl = data["url"] as String?
+            val cloudinaryID = data["public_id"] as String
+
+            user?.let {
+                val image = imageUrl?.let { Image(name, description, category, it, cloudinaryID, user) }
+                val newImage = imageService.addImage(image!!)
+                val response = ImageResponse(true, newImage)
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+            }
+        }
+
+        val response = ImageResponse(success = false, data = "An error occurred")
+        return ResponseEntity(response, HttpHeaders(), HttpStatus.BAD_REQUEST)
     }
 
     @GetMapping
@@ -104,6 +118,7 @@ class ImageController(private val imageService: ImageService,
             val response = ImageResponse(false, data = "No image with id $id found")
             return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
         }
+        imageService.deleteFromCloudinary(id)
         imageService.deleteImage(id)
         val response = ImageResponse(true, data = "Image deleted successfully")
         return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
