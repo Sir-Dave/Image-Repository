@@ -14,15 +14,16 @@ import javax.servlet.http.HttpServletRequest
 @RequestMapping("api/v1/images")
 class ImageController(private val imageService: ImageService,
                       private val userService: UserService,
-                      private val jwtTokenUtil: JwtTokenUtil) {
+                      private val jwtTokenUtil: JwtTokenUtil,
+                      private val request: HttpServletRequest
+) {
 
     @PostMapping
     fun uploadImage(
         @RequestParam name: String,
         @RequestParam description: String,
         @RequestParam category: String,
-        @RequestParam file: MultipartFile,
-        request: HttpServletRequest): ResponseEntity<ImageResponse<*>>{
+        @RequestParam file: MultipartFile): ResponseEntity<ImageResponse<*>>{
 
         val user = getCurrentLoggedUser(request, jwtTokenUtil, userService)
 
@@ -120,9 +121,21 @@ class ImageController(private val imageService: ImageService,
             val response = ImageResponse(false, data = "No image with id $id found")
             return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
         }
-        imageService.deleteFromCloudinary(id)
-        imageService.deleteImage(id)
-        val response = ImageResponse(true, data = "Image deleted successfully")
-        return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
+        val user = getCurrentLoggedUser(request, jwtTokenUtil, userService)
+        user?.let {
+            check(imageService.isImageUploadedByUser(id, user)){
+                val response = ImageResponse(false, data = "You do not have sufficient " +
+                        "permission to delete this image")
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.UNAUTHORIZED)
+            }
+            imageService.deleteFromCloudinary(id)
+            imageService.deleteImage(id)
+            val response = ImageResponse(true, data = "Image deleted successfully")
+            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+        }
+
+        val response = ImageResponse(success = false, data = "An error occurred")
+        return ResponseEntity(response, HttpHeaders(), HttpStatus.BAD_REQUEST)
+
     }
 }

@@ -12,6 +12,6 @@ fun getCurrentLoggedUser(request: HttpServletRequest, jwtTokenUtil: JwtTokenUtil
     val token = header.split(" ").toTypedArray()[1].trim { it <= ' ' }
 
     val id = jwtTokenUtil.getUserId(token)
-    println("Cart Controller: User id is $id")
+    println("AppDebug: User id is $id")
     return userService.getOneUser(id.toLong())
 }

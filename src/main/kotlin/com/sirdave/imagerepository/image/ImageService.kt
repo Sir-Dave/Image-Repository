@@ -68,6 +68,11 @@ class ImageService(private val imageRepository: ImageRepository) {
             .orElseThrow{IllegalStateException("Image with id $id does not exist")}
     }
 
+    fun isImageUploadedByUser(id: Long, user: User): Boolean{
+        val image = findImageById(id)
+        return image.user == user
+    }
+
     fun deleteImage(id: Long){
         val exists = imageRepository.existsById(id)
         check(exists) { "Image with id $id does not exist" }
