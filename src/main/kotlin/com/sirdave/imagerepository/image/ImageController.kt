@@ -50,45 +50,47 @@ class ImageController(private val imageService: ImageService,
         @RequestParam(defaultValue = "") category: String,
         @RequestParam(defaultValue = "") username: String): ResponseEntity<ImageResponse<*>>{
 
-        val user = userService.findUserByUsername(username)
-        val isCategoryExists = imageService.isCategoryExists(category)
-
-        if (category != "" && username != ""){
-            check(user != null){
-                val response = ImageResponse(success = false, data = "User does not exist")
-                return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
-            }
-
+        if (category != ""){
+            val isCategoryExists = imageService.isCategoryExists(category)
             check(isCategoryExists){
                 val response = ImageResponse(success = false, data = "Category not found")
                 return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
             }
 
-            val images = imageService.findImagesByCategoryAndUser(category, user, page,  pageSize)
-            val response = ImageResponse(success = true, data = images)
-            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+            if (username != ""){
+                val user = userService.findUserByUsername(username)
+                check(user != null){
+                    val response = ImageResponse(success = false, data = "User does not exist")
+                    return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
+                }
+
+                // filter by username and category
+                val images = imageService.findImagesByCategoryAndUser(category, user, page,  pageSize)
+                val response = ImageResponse(success = true, data = images)
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+
+            }
+            else{
+                //filter by category only
+                val images = imageService.findImagesByCategory(category, page, pageSize)
+                val response = ImageResponse(success = true, data = images)
+                return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+            }
         }
         else if (username != ""){
+            val user = userService.findUserByUsername(username)
             check(user != null){
                 val response = ImageResponse(success = false, data = "User does not exist")
                 return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
             }
+            //filter by username only
             val images = imageService.findImagesByUser(user)
-            val response = ImageResponse(success = true, data = images)
-            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
-        }
-        else if (category != ""){
-            check(isCategoryExists){
-                val response = ImageResponse(success = false, data = "Category not found")
-                return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
-            }
-            val images = imageService.findImagesByCategory(category, page, pageSize)
             val response = ImageResponse(success = true, data = images)
             return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
         }
 
         else{
-            val images =  imageService.getAllImages(page, pageSize)
+            val images = imageService.getAllImages(page, pageSize)
             val response = ImageResponse(success = true, data = images)
             return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
         }
@@ -108,12 +110,12 @@ class ImageController(private val imageService: ImageService,
     }
 
     @PutMapping("/{id}")
-    fun updateImageProperties(id: Long){
+    fun updateImageProperties(@PathVariable id: Long){
 
     }
 
     @DeleteMapping("/{id}")
-    fun deleteImage(id: Long): ResponseEntity<ImageResponse<*>>{
+    fun deleteImage(@PathVariable id: Long): ResponseEntity<ImageResponse<*>>{
         check(imageService.isImageExists(id)){
             val response = ImageResponse(false, data = "No image with id $id found")
             return ResponseEntity(response, HttpHeaders(), HttpStatus.NOT_FOUND)
