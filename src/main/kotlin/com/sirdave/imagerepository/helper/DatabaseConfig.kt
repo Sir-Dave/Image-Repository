@@ -15,10 +15,10 @@ class DatabaseConfig {
     @Bean
     fun dataSource(): DataSource {
         val config = HikariConfig()
-        config.jdbcUrl = dbUrl;
-        //config.jdbcUrl = System.getenv("DB_URL")
-        //config.username = System.getenv("DB_USER")
-        //config.password = System.getenv("DB_PASS")
+        //config.jdbcUrl = dbUrl;
+        config.jdbcUrl = System.getenv("DB_URL")
+        config.username = System.getenv("DB_USER")
+        config.password = System.getenv("DB_PASS")
         return HikariDataSource(config)
     }
 }

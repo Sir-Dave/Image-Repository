@@ -1,5 +1,6 @@
 package com.sirdave.imagerepository.user
 
+import com.sirdave.imagerepository.image.Image
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -49,5 +50,10 @@ class UserService(private val userRepository: UserRepository,
         val encodedPassword = passwordEncoder.encode(user.password)
         user.setPassword(encodedPassword)
         return userRepository.save(user)
+    }
+
+    fun getImagesByUser(username: String): List<Image>?{
+        val user = findUserByUsername(username)
+        return user?.images
     }
 }

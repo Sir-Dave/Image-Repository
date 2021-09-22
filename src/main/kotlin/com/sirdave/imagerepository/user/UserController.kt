@@ -3,6 +3,7 @@ package com.sirdave.imagerepository.user
 
 import com.sirdave.imagerepository.auth.UserResponse
 import com.sirdave.imagerepository.helper.getCurrentLoggedUser
+import com.sirdave.imagerepository.image.ImageResponse
 import com.sirdave.imagerepository.security.JwtTokenUtil
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -30,6 +31,18 @@ class UserController(private val jwtTokenUtil: JwtTokenUtil,
         return ResponseEntity(response, HttpHeaders(), HttpStatus.UNAUTHORIZED)
     }
 
+    @GetMapping("/profile/images")
+    fun getMyImages(request: HttpServletRequest): ResponseEntity<ImageResponse<*>>{
+        val user = getCurrentLoggedUser(request, jwtTokenUtil, userService)
+        user?.let {
+            val images = user.images
+            val response = ImageResponse(success = true, data = images)
+            return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
+        }
+        val response = ImageResponse(success = false, data = "You have to log in first")
+        return ResponseEntity(response, HttpHeaders(), HttpStatus.UNAUTHORIZED)
+    }
+
     @GetMapping("/{username}")
     fun getUserProfile(@PathVariable username: String): ResponseEntity<UserResponse<*>>{
         val otherUser = userService.findUserByUsername(username)
@@ -45,5 +58,12 @@ class UserController(private val jwtTokenUtil: JwtTokenUtil,
             val response = UserResponse(success = false, data = "You have to log in first", null)
             ResponseEntity(response, HttpHeaders(), HttpStatus.UNAUTHORIZED)
         }
+    }
+
+    @GetMapping("/{username}/images")
+    fun getImagesByUsername(@PathVariable username: String): ResponseEntity<ImageResponse<*>>{
+        val images = userService.getImagesByUser(username)
+        val response = ImageResponse(success = true, data = images)
+        return ResponseEntity(response, HttpHeaders(), HttpStatus.OK)
     }
 }
